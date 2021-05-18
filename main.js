@@ -1,10 +1,13 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, Menu} = require('electron')
-const path = require('path')
+const {app, BrowserWindow, Menu, dialog} = require('electron');
+const path = require('path');
+const fs = require('fs');
+
+let mainWindow;
 
 function createWindow () {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -20,11 +23,18 @@ function createWindow () {
 
     submenu:[
       {
-          label: "Νέο Τιμολόγιο"
+          label: "Νέο Τιμολόγιο",
+          click(){
+            
+          }
       },
 
       {
-        label: "Άνοιγμα Τιμολογίου"
+        label: "Άνοιγμα Τιμολογίου",
+
+        click(){
+          openFile(['md'],'js');
+        }
       },
 
       {
@@ -33,7 +43,7 @@ function createWindow () {
           app.quit()
         },
 
-        accelerator: "crtl q"
+        accelerator: "crtl+q"
       }
     ]
   },
@@ -70,3 +80,22 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+// Open file function 
+function openFile(s_name, s_extension){
+  const files = dialog.showOpenDialogSync(mainWindow, {
+    properties:['openFile'],
+    filters: [{
+     name:s_name,
+     extensions:s_extension 
+    }]
+  });
+
+  if (!files)
+    return;
+
+  const file = files[0];
+
+  const fileContent = fs.readFileSync(file).toString();
+  console.log(fileContent);
+}
